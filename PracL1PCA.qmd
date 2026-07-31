@@ -172,10 +172,27 @@ Do not remove an observation merely because it is large. Remove an observation o
 #| label: prepare-clean-mali-pca-data
 
 
+#points that will likely distort the analysis
+
+anom_cattle=max(data_tidy_mali['cattle'])
+anom_fam=max(data_tidy_mali['family'])
+anom_dist=max(data_tidy_mali['dist_rd'])
+
+data_tidy_mali %>% filter(cattle==anom_cattle);
+data_tidy_mali %>% filter(family==anom_fam);
+data_tidy_mali %>% filter(dist_rd==anom_dist);
+
+
+
+hist(data_tidy_mali['cattle'])
+
+#View(data_tidy_mali)
+
+mali_pca_clean <- data_tidy_mali
 ```
 
 **Interpretation:**\
-Describe any potentially unusual observations and justify your decision to retain or exclude them.
+Family size, nr cattle and dist_km show extreme outlier values relative to the distributions of other features. Although the values are extreme they are not outside the scope of reasonability as the associated values of other fearure for the data point are still within a reasonable scope?
 
 ## Question 3: Decide whether to standardise
 
@@ -188,6 +205,22 @@ Use the variable descriptions and the numerical summaries from Question 1 to dec
 
 ```{r}
 #| label: summarise-variable-scales
+
+# Variables such as family, dist_rd and cattle have much bigger variances relative to other features due to their inherent magnitudes and units of measurement. Count data such as nr family, nr cattle etc will on average have smaller units compared to distnace units link km. 
+
+#As such standardizing these to similar scales, i.e bounding the values between 0 and 1, ensures that all units will be have a faire chance of bieng weighted "fairely" by the model. Also hecter units are quite small compared to KM.
+ 
+# Also means are very sensitive to outliers which are present in the data SO centering alone may not be enough to ensure reasonable model results
+
+
+# standardizing makes the values across featues more comparable 
+
+df_scaled <-data_tidy_mali %>% 
+  mutate(across(where(is.numeric), scale)) # choose to sta
+
+df_scaled %>% head(5)
+
+#hist.data.frame(df_scaled) 
 
 ```
 
@@ -204,6 +237,15 @@ Store the fitted object as `mali_pca_fit`.
 #| label: fit-mali-pca
 
 
+mali_pca_fit=prcomp(
+  ~ .,
+  data = mali_pca_clean,
+  retx = TRUE,
+  scale.=TRUE # scale since the feature magnitudes/variances are not comprable
+)
+
+
+
 ```
 
 The main parts of the fitted object are:
@@ -218,11 +260,39 @@ Confirm that the score matrix has one row per observation and one column per pri
 #| label: inspect-mali-pca-object
 
 
+dim(mali_pca_fit$x) # PCA scores of every observation
+
+dim(mali_pca_clean) # object dimensions equals the simensions of the original data
+
+summary(mali_pca_fit)
+
+data.frame(mali_pca_fit$rotation)
 ```
 
 ## Question 5: Fit the PCA using `eigen`
 
 Fit the PCA using the eigen decomposition of the covariance/correlation matrix (depending on the decision you made earlier regarding standardisation). Confirm that the results are equivalent to those from `prcomp()`.
+
+```{r}
+
+# using eignen on the correlation matrix, since we decided to standardize the data
+
+cor_matrix <- mali_pca_clean %>%
+  select(where(is.numeric)) %>%
+  cor(use = "complete.obs")
+
+cor_matrix=as.matrix(cor_matrix)
+
+#REMEBER, EIGENVALS -VARIANCES OF THE PCs
+eigen(cor_matrix)$values; # THE SAME, YAY!
+mali_pca_fit$sdev^2
+
+# CHECK EIGENVECTORS= LOADING VECTORS/WEIGHT VECTORS
+
+eigen(cor_matrix)$vectors; # THE SAME, YAY!
+mali_pca_fit$rotation
+
+```
 
 ## Question 6: Examine the variation explained
 
@@ -233,7 +303,22 @@ Store the results in a table called `mali_pve_tbl`.
 ```{r}
 #| label: calculate-mali-pve
 
+# CALL summary on prcomp to get the cumulative and proportion of variance explained
+summary(mali_pca_fit)
 
+# Using eignevals
+eigen(cor_matrix)$values
+var_prop=eigen(cor_matrix)$values/sum(eigen(cor_matrix)$values);var_prop
+
+cum_var=c()
+for (i in length(var_prop)){
+  cum_i=sum(var_prop[1:i])/sum(var_prop)
+  cum_var=c(cum_var,cum_i)
+}
+
+cum_var # THE SAME YAY!
+
+mali_pve_tbl=summary(mali_pca_fit)
 ```
 
 Construct a scree plot showing the proportion of variation explained by each component.
@@ -242,7 +327,7 @@ Construct a scree plot showing the proportion of variation explained by each com
 #| label: fig-mali-pca-scree
 #| fig-cap: "Proportion of variation explained by each principal component in the Mali survey data."
 
-
+screeplot(mali_pca_fit, type = "lines", main = "PCA Scree Plot")
 ```
 
 How many components would you retain for a low-dimensional summary of these data?
@@ -254,10 +339,12 @@ Display the loadings for the first two principal components.
 ```{r}
 #| label: inspect-mali-pca-loadings
 
-
+data.frame(mali_pca_fit$rotation) %>% select(PC1,PC2)
 ```
 
 Provide interpretations for the first two principal components.
+
+\*COMEBACK
 
 ## Question 8: Examine the principal component scores
 
@@ -266,6 +353,8 @@ Create a score table containing PC1 and PC2.
 ```{r}
 #| label: prepare-mali-pca-scores
 
+score_tab_pc2=data.frame(mali_pca_fit$x) %>% select(PC1,PC2)
+score_tab_pc2
 
 ```
 
@@ -275,6 +364,13 @@ Plot the observations using their first two principal component scores.
 #| label: fig-mali-pca-scores
 #| fig-cap: "Mali survey observations represented by their scores on the first two principal components."
 
+
+score_tab_pc2 %>% 
+  ggplot(aes(x=PC1,y=PC2))+
+  geom_point()+
+  labs(title = "PC Plot",
+       x = "PC 1",y='PC 2')+
+  theme_minimal()
 ```
 
 Comment on the plot.
@@ -287,4 +383,8 @@ Construct a biplot using the first two principal components.
 #| label: fig-mali-pca-biplot
 #| fig-cap: "Biplot of the first two principal components for the standardised Mali survey variables."
 
+biplot(mali_pca_fit, scale = 0,expand=8)
+
 ```
+
+-   Tomorrow figure out how to make the above plot bigger and more readable to interprete
