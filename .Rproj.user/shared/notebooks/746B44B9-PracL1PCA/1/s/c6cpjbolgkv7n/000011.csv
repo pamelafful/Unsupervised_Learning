@@ -1,0 +1,5 @@
+"0",""
+"0","# Get var across all columns"
+"0","# Family, dist_rd,cattle report the biggest variance/spread across features"
+"0","# cotton,maize,sorg,millt are measured in the same units so they variances are relatively comparable"
+"0","data_tidy_mali %>% summarise(across(everything(), var, na.rm = TRUE))"

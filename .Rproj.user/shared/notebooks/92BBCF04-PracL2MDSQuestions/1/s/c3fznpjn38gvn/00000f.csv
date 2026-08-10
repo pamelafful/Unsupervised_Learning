@@ -1,0 +1,5 @@
+"0","#| label: load-mds-practical-packages"
+"0","library(MASS)"
+"0","library(tibble)"
+"0","library(dplyr)"
+"0","library(ggplot2)"

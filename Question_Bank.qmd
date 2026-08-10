@@ -1,0 +1,252 @@
+---
+title: "Moi"
+format: html
+editor: visual
+---
+
+## Principal component analysis 
+
+1\. Explain the problem with simply maximising the variance for each principal component.
+
+We could just arbitrarily multiply the loading vector by a scalar to make the variance bigger, which makes the objective function meaningless (as the solution is infinite)
+
+2\. Why must a loading vector be restricted to unit length? Is there anything special about choosing unit length rather than some other fixed length?\
+\
+The unit-length constraint is necessary because multiplying every coefficient by a large constant would otherwise increase the variance without changing the direction.
+
+3. Interpret the following biplots.
+
+4.  Suppose that a scree plot is flat. What might cause this?
+
+    The underlying data structure if non-linear/curved. PCA works mostly when the relationship between variables can be represented by a linear substructure
+
+5.  Suppose that the first principal component captures 99.5% of the variation and loads on only one variable. What might have given rise to this?\
+    \
+    We need to standardize the variables. If the first variable is measured on a bigger scale relative to other features which in turn dominates the variances.
+
+6.  Discuss whether standardisation is warranted in each of the following settings: \
+
+    -    height and weight
+
+    -   gene expression across 10,000 genes, where some genes are expressed and others are not.
+
+7.  Discuss the effect on the interpretation of the loadings if they are all multiplied by −1.
+
+8.  How might we handle highly skewed variables?\
+    Apply some transformation to the data that brings extreme disparities closer and makes them more reasonable
+
+9.  Describe how a biplot shows each of the following: \
+    • spread between observations- clusters of onservation separation in the lower PCA dimension\
+    • association between variables- Looking at the angle between feature vectors in the lower dim plot. Feature vectors with angle between 0 and 90 (excluding) show positive correlation betwen features with smaller angles denoting higher correlations, 90 degree angles showing no correlations, angle greater than 90 to 180 angle showing negative correlations\
+    • drivers of spread between variables.- we see the direction in which vectors for features increase and which observations lie in that direction (implying that those observations have larger values for those feature(s)). Feature vectors with longer lengths imply that the majority of the variation in the lower PCA dimension is dominated by that feature(s)
+
+10. Calculate the PCA score for the following observation and loading vector.
+
+11. Calculate the variance of a principal component for the supplied loading vector and covariance matrix Σ.
+
+## **Multidimensional scaling**
+
+a\. Let Δ be an 𝑛×𝑛 dissimilarity matrix. How many parameters does MDS optimise when fitting:
+
+• a two-dimensional map? 2
+
+• a 𝑘-dimensional map? k
+
+b\. What does classical MDS aim to represent?
+
+Lower-dimensional coordinates that preserve the inter-point distances in the original input dissimilarity matrix
+
+c. Discuss the relative suitability of MDS and PCA for binary variables.
+
+d\. Contrast 𝛿𝑖𝑗, 𝑑𝑖𝑗 and 𝑑̂𝑖𝑗, using the notation from the slides.
+
+-    𝛿𝑖𝑗- original input dissimilarities
+
+-   𝑑𝑖𝑗- lower dimensional configured distances
+
+-   fitted disparities from metric and non-metric MDS
+
+e\. Describe how least-squares MDS can give greater priority to accurately representing smaller dissimilarities.
+
+-   shrinking or dividing errors by large squared values of the original dissimilarity.
+
+f. Does downweighting errors associated with larger 𝛿𝑖𝑗 values change how we interpret interpoint distances in MDS? What changes when non-metric MDS is used?
+
+-   In metric MDS, down weighting the errors from large dissimilarities puts more emphasis on properly representing small interpoint distances than large interpoint distances, thus, the interpoint distances for large dissimilarities are not as accurate in the lower configuration. Interpretation as far as distance ratios are concerned cannot be accurately inferred\
+    \
+    Non-metric MDS does not suffer from this, as its only objective is to preserve the ordering of the interpoint distances. Thus if down-weighting does not affect the order rank of the interpoint distances, non-metric MDS is robust to this.
+
+g\. Explain when and why MDS may scale poorly.
+
+-   When the dataset is quite large, requiring massive storage of the n\*n distance matrix. Computation grows quadratically O(n\^2)
+
+### **ISOMAP** 
+
+a\. Explain why ISOMAP uses classical MDS rather than non-metric MDS.
+
+ISOMAPs discretize the lower dimensional space by approximating a non-linear manifold structure using observations. Nearby/neighbourhood distances are trustworthy and are calculated using straight-line Euclidean distances between nearby points. Applying classical MDS on these distances ensures that we are able to "preserve" the non-linear distances of observations across the data set. **Classical MDS is appropriate because it tries to find coordinates whose Euclidean distances reproduce those numerical geodesic distances. Non-metric MDS is unnecessary because ISOMAP has already constructed numerical geodesic distances that it wants to preserve, rather than merely their rank ordering.**
+
+b. Does ISOMAP use geodesic distances? Discuss.
+
+Yes. ISOMAP approximates the geodesic distances by constructing a graph network using the data observations. Nearby points are joined using straight-line Euclidean edges. True geodesic distances between distant observations are approximated by traversing the shortest connected path through the edges between these points.
+
+c\. Discuss the effect on the 𝑘-nearest-neighbour graph and the resulting ISOMAP representation of setting:
+
+• 𝑘=1: This most likely results in a disconnected graph with disconnected clusters, making it difficult to approximate the true distance between distant observations as there may be no edges connecting them
+
+• 𝑘=𝑛−1: This may create short-circuiting, as mostly the graph will be almost completely connected. This can result in the graph defaulting to normal straight-line Euclidean distances between distant points, which cuts through the surrounding higher-dimensional space and not along the approximated manifold structure.
+
+Then discuss what would constitute a reasonable middle ground.
+
+-   An appropriate middle ground is choosing a k large enough to ensure that graph remains connected and small enough to ensure that the distance between points is constrained along the approximated geodesic path i.e connected while preserving local manifold structure.
+
+d\. Calculate the graph distance between vertices A and F in the following full graph. Insert the graph here.
+
+e\. Discuss ISOMAP’s vulnerability to noise.
+
+-   Noise can obscure the local geometry of the data, which can create false neighbours and make graph paths unstable.
+
+-   Expanded: Noise can distort local neighbourhood relationships, creating false edges or removing appropriate ones. Since global geodesic distances are obtained from shortest paths through these local edges, errors in the neighbourhood graph can propagate into the estimated global geometry.\
+
+f\. Discuss when a 𝑘-nearest-neighbour graph and an 𝜀-neighbourhood graph are each appropriate.
+
+-    𝑘-nearest-neighbour: here the nearest k points to an observation are connected. This is mostly appropriate when you want to ensure that at least every point has an edge connected to it, even if that point(s) may be an outlier/ regardless of local density.
+
+-   𝜀-neighbourhood: Here points that lie within a certain threshold distance are connected. This is most appropriate when the data is evenly densely distributed to ensure that most points will have edges connected to them (may be unsuitable to sparsely distributed data or when data density is uneven across regions)
+
+g\. Explain in what sense the Swiss roll is a two-dimensional object embedded in a three-dimensional space.\
+\
+The Swiss roll is an object that can be unrolled into a two-dimensional structure whereby the true distances between points are measured along. Thus points that may appear close by in the 3D embedding are actually far apart when the distance is traced along the roll ( in 2D) as opposed to across ( which is what ordinary Euclidean distances would measure).
+
+## **Self-organising maps** 
+
+1\. Describe why SOMs are more robust to outliers than, say, PCA.
+
+SOMs are more robust to outliers since every observation is allocated into a grid unit by virtue of its distance to the prototype vector of its best matching unit, BMU. As such, even points with large variations can be placed in a grid and assessed based on their distance to other densely populated/clustered grid units.
+
+-   **Extreme observations need not visually distort the plot, as all points lie on a fixed grid.**\
+    \
+    SOMs can be more robust to outliers than PCA because the representation is distributed across many local prototype vectors. An isolated outlier tends to influence nearby prototypes rather than determining a global direction of maximum variance, as it can in PCA.
+
+2\. Describe why SOMs are more robust to large differences in variance between variables than, say, PCA.
+
+Same answer as q1.
+
+3\. In PCA, movement along a given axis is associated with a consistent pattern of change in an underlying set of variables. Does a SOM grid behave the same way? Discuss.
+
+Yes. SOM can behave the same way by looking at the corrosponding features averaged feature values in th the respective grid units and how the value of the averaged feature values changes across grid units in the map, as shown in a component map.\
+\
+**Correction: No, not necessarily. Unlike PCA, the SOM axes do not represent fixed linear combinations of the original variables. The grid coordinates are just locations on the lattice. However, component planes can reveal systematic changes in individual variables across the map, which may make certain directions on the grid appear associated with particular feature patterns.**
+
+4\. Suppose that a SOM node has no observations allocated to it. Does it have a prototype vector? If so, how is it determined? \
+Yes it has a prototype vector, however, the prototype vector in this case is determined by the prototype vectors in the adjacent units
+
+5\. Why might a SOM node have no observations allocated to it?
+
+This may be due to a large number of grid units (relative to the number of observations) chosen at the start of training. The data may be sufficiently assigned to earlier grid units.
+
+6\. Contrast SOMs with 𝑘-means in terms of their prototypes.
+
+-   SOMS- when assigning a new observation to a unit in the grid, not only does the BMU move toward the observation but the adjacent units as well, albeit by a lesser degree. The prototype vectors of the surrounding units are also updated when a new observation is added.
+
+-   K-means. Only the BMU unit moves when a new observation is assigned to it. Its prototype vector is thus only influenced by the observations inside it and updated as such
+
+7\. Explain what the learning rate and neighbourhood weight function are, how they change, and why they change over the course of a SOM fitting procedure.
+
+-   learning rate: determines how quickly the algorithm updates the /learns after the addition of a new observation/iteration
+
+-    neighbourhood weight function: This determines the degree of effect/movement to neighbouring grids when, j, when a new observation is added to a BMU. Closer units to the BMU will have a greater degree of movement than more distant grid units (which may move very little or not at all)
+
+-   In early training, these values are large but tend to decrease at later iterations as the grid moves from global organisation to local refinement.
+
+8. Contrast how SOMs and ISOMAP handle non-linearities.
+
+-   ISOMAP handles non-linearities by approximating the underlying geodesic distances using a graph network through the observations and applying classical MDS on these distances
+
+-   SOM handles non-linearities by the usage of a prototype vector that gives an average of features in a grid unit in the p-dimensional observation space (where p = number of features). **SOM handles nonlinear structure by learning a nonlinear, topology-preserving mapping from the high-dimensional data space onto a low-dimensional grid of prototype vectors.**
+
+9\. Contrast a node’s grid location with its prototype vector.
+
+-   Grid location shows where the grid unit is located in the 2D grid space/map
+
+-   Prototype vector "operates" in the original p-dimensional space and is determined by the feature values of the observations in its grid unit and surrounding neighbourhood units.- Tlls us the type of observations that unit represents
+
+10\. Explain the role of an observation’s location in grid space (map space) during the SOM fitting procedure.
+
+-   The role of an observation's location in grid space determines its BMU by virtue of the shortest distance between it and the prototype vectors in the grid. The prototype vectors also exist in the p-dimensional space, which ensures that distance comparisons can be computed.\
+    \
+    CorrectionThe observation's BMU determines its location in grid space; its grid location does not determine its BMU.
+
+11. What is the best matching unit?
+
+The unit in the grid that best fits a new observation, for which it has the shortest distance amongst grid unit prototype vectors.
+
+12\. Explain how a SOM node can be updated despite having had no observation allocated to it. \
+
+When assigning a new observation to a unit in the grid, not only does the BMU move toward the observation but the adjacent units as well, albeit by a lesser degree. The prototype vectors of the surrounding units are also updated when a new observation is added via the difference between its prototype vector and the new observation, the neighbourhood function and the learning rate.
+
+13\.
+
+14. Explain why the neighbourhood weights must be non-negative.
+
+    -   This must be positive to ensure prototype movement toward the observation, not away from it
+
+15. Describe the sense in which a SOM is a restricted version of 𝑘-means.
+
+    -   SOMS- when assigning a new observation to a unit in the grid, not only does the BMU move toward the observation but the adjacent units as well, albeit by a lesser degree. The prototype vectors of the surrounding units are also updated when a new observation is added. This it is restricted K-means because adjacent/neighbourhood units also move in the direction of a new observation addition/assignment.
+
+16. Describe a component plane.
+
+    The component plane shows how each feature value in the different prototype vectors change across the grid configuration
+
+17. Describe a U-matrix.
+
+    The U matrix shows how different neighbourhood prototypes are in the original space and is used to assess topographical grid configuration. A good configuration would show small neighbourhood inter-prototype distances close to each other in the grid whilst big distances are spaced apart.
+
+18. What is quantisation error? What is topographic error? How do the two complement each other?
+
+    -   Quantisation error measures the average distance between observations and their respective prototype vectors- smaller is better
+
+    -   Topographic error- speaks to grid organisation. For each observation, the closest and second prototype vectors should be located adjacent to the observation's BMU. If not, that would be counted as a topographical error
+
+    -   One speaks to how good the grouping or clustering of observations in the original space is, by means of how similar the points are to the prototype, and the other speaks to the organisation of grid unit neighbours.
+
+19. In what sense are SOMs computationally efficient compared with, say, MDS?
+
+    -   SOM does not need to store the n\*n distance matrix
+
+    -   It scales quite well when K= nr units \<\<p= nr of features. Computation is quick, especially when adding a new observation; only the distance between the new observation and prototype vectors needs to be computed. Operations increase linearly by O(Kp)
+
+20. Contrast a node in a SOM with a node in a 𝑘-nearest-neighbour graph in ISOMAP.
+
+    -   ISOMAP- node is an actual data point connected to by an edge
+
+    -   SOM- A grid unit which houses a group of observations in a grid map, for which we can count the number of observations in i.e node count
+
+## **Autoencoders**
+
+ 1. Explain the role of the encoder.
+
+2\. Explain the role of the decoder.
+
+3\. Explain under what circumstances an autoencoder behaves like PCA.
+
+4\. What is the bottleneck layer?
+
+5\. Explain why non-linear activation functions are important in autoencoders.
+
+6\. Suppose the bottleneck layer has as many nodes as the input layer. What is the issue here?
+
+7\. Explain when different relevant loss functions are appropriate.
+
+8\. What is the autoencoder trying to predict?
+
+9. Explain why held-out data are required for autoencoders.
+
+10\. Why might reconstruction error eventually begin to increase as the number of nodes in the bottleneck layer increases on:
+
+• the training data;
+
+• the test data?
+
+11\. In a denoising autoencoder, what is the input and what is the output it is trying to predict? Why is this done?

@@ -1,0 +1,4 @@
+"0","#| label: prepare-mali-pca-scores"
+"0",""
+"0","score_tab_pc2=data.frame(mali_pca_fit$x) %>% select(PC1,PC2)"
+"0","score_tab_pc2"

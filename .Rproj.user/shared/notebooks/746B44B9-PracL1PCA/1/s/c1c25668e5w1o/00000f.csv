@@ -1,0 +1,4 @@
+"0","#| label: fig-mali-pca-scree"
+"0","#| fig-cap: ""Proportion of variation explained by each principal component in the Mali survey data."""
+"0",""
+"0","screeplot(mali_pca_fit, type = ""lines"", main = ""PCA Scree Plot"")"

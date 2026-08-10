@@ -1,0 +1,32 @@
+---
+title: "Quiz1"
+format: html
+editor: visual
+---
+
+```{r}
+a=sqrt(2)
+loading_vec=t(c(1/a,-1/a ))
+x=t(t(c(0.8,0.2)))
+
+pca_score=loading_vec%*%x
+dim(loading_vec);dim(x);round(pca_score,2)
+loading_vec
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+
+cov_mat=rbind(c(1,0.8), c(0.8,1))
+
+# Use eigen decom to find our eienval and eigenvect
+
+first_comp_val=sort(eigen(cov_mat)$values,decreasing=T)[1];first_comp_val
+
+eigen(cov_mat)$vectors[,1]
+1/a
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).

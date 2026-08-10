@@ -1,0 +1,3 @@
+"0","#| label: inspect-mali-pca-loadings"
+"0",""
+"0","data.frame(mali_pca_fit$rotation) %>% select(PC1,PC2)"
