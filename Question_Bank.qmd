@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-## Principal component analysis 
+## Principal component analysis
 
 1\. Explain the problem with simply maximising the variance for each principal component.
 
@@ -14,7 +14,7 @@ We could just arbitrarily multiply the loading vector by a scalar to make the va
 \
 The unit-length constraint is necessary because multiplying every coefficient by a large constant would otherwise increase the variance without changing the direction.
 
-3. Interpret the following biplots.
+3.  Interpret the following biplots.
 
 4.  Suppose that a scree plot is flat. What might cause this?
 
@@ -24,9 +24,9 @@ The unit-length constraint is necessary because multiplying every coefficient by
     \
     We need to standardize the variables. If the first variable is measured on a bigger scale relative to other features which in turn dominates the variances.
 
-6.  Discuss whether standardisation is warranted in each of the following settings: \
+6.  Discuss whether standardisation is warranted in each of the following settings:\
 
-    -    height and weight
+    -   height and weight
 
     -   gene expression across 10,000 genes, where some genes are expressed and others are not.
 
@@ -35,7 +35,7 @@ The unit-length constraint is necessary because multiplying every coefficient by
 8.  How might we handle highly skewed variables?\
     Apply some transformation to the data that brings extreme disparities closer and makes them more reasonable
 
-9.  Describe how a biplot shows each of the following: \
+9.  Describe how a biplot shows each of the following:\
     • spread between observations- clusters of onservation separation in the lower PCA dimension\
     • association between variables- Looking at the angle between feature vectors in the lower dim plot. Feature vectors with angle between 0 and 90 (excluding) show positive correlation betwen features with smaller angles denoting higher correlations, 90 degree angles showing no correlations, angle greater than 90 to 180 angle showing negative correlations\
     • drivers of spread between variables.- we see the direction in which vectors for features increase and which observations lie in that direction (implying that those observations have larger values for those feature(s)). Feature vectors with longer lengths imply that the majority of the variation in the lower PCA dimension is dominated by that feature(s)
@@ -56,11 +56,11 @@ b\. What does classical MDS aim to represent?
 
 Lower-dimensional coordinates that preserve the inter-point distances in the original input dissimilarity matrix
 
-c. Discuss the relative suitability of MDS and PCA for binary variables.
+c.  Discuss the relative suitability of MDS and PCA for binary variables.
 
 d\. Contrast 𝛿𝑖𝑗, 𝑑𝑖𝑗 and 𝑑̂𝑖𝑗, using the notation from the slides.
 
--    𝛿𝑖𝑗- original input dissimilarities
+-   𝛿𝑖𝑗- original input dissimilarities
 
 -   𝑑𝑖𝑗- lower dimensional configured distances
 
@@ -70,7 +70,7 @@ e\. Describe how least-squares MDS can give greater priority to accurately repre
 
 -   shrinking or dividing errors by large squared values of the original dissimilarity.
 
-f. Does downweighting errors associated with larger 𝛿𝑖𝑗 values change how we interpret interpoint distances in MDS? What changes when non-metric MDS is used?
+f.  Does downweighting errors associated with larger 𝛿𝑖𝑗 values change how we interpret interpoint distances in MDS? What changes when non-metric MDS is used?
 
 -   In metric MDS, down weighting the errors from large dissimilarities puts more emphasis on properly representing small interpoint distances than large interpoint distances, thus, the interpoint distances for large dissimilarities are not as accurate in the lower configuration. Interpretation as far as distance ratios are concerned cannot be accurately inferred\
     \
@@ -80,13 +80,13 @@ g\. Explain when and why MDS may scale poorly.
 
 -   When the dataset is quite large, requiring massive storage of the n\*n distance matrix. Computation grows quadratically O(n\^2)
 
-### **ISOMAP** 
+### **ISOMAP**
 
 a\. Explain why ISOMAP uses classical MDS rather than non-metric MDS.
 
 ISOMAPs discretize the lower dimensional space by approximating a non-linear manifold structure using observations. Nearby/neighbourhood distances are trustworthy and are calculated using straight-line Euclidean distances between nearby points. Applying classical MDS on these distances ensures that we are able to "preserve" the non-linear distances of observations across the data set. **Classical MDS is appropriate because it tries to find coordinates whose Euclidean distances reproduce those numerical geodesic distances. Non-metric MDS is unnecessary because ISOMAP has already constructed numerical geodesic distances that it wants to preserve, rather than merely their rank ordering.**
 
-b. Does ISOMAP use geodesic distances? Discuss.
+b.  Does ISOMAP use geodesic distances? Discuss.
 
 Yes. ISOMAP approximates the geodesic distances by constructing a graph network using the data observations. Nearby points are joined using straight-line Euclidean edges. True geodesic distances between distant observations are approximated by traversing the shortest connected path through the edges between these points.
 
@@ -110,7 +110,7 @@ e\. Discuss ISOMAP’s vulnerability to noise.
 
 f\. Discuss when a 𝑘-nearest-neighbour graph and an 𝜀-neighbourhood graph are each appropriate.
 
--    𝑘-nearest-neighbour: here the nearest k points to an observation are connected. This is mostly appropriate when you want to ensure that at least every point has an edge connected to it, even if that point(s) may be an outlier/ regardless of local density.
+-   𝑘-nearest-neighbour: here the nearest k points to an observation are connected. This is mostly appropriate when you want to ensure that at least every point has an edge connected to it, even if that point(s) may be an outlier/ regardless of local density.
 
 -   𝜀-neighbourhood: Here points that lie within a certain threshold distance are connected. This is most appropriate when the data is evenly densely distributed to ensure that most points will have edges connected to them (may be unsuitable to sparsely distributed data or when data density is uneven across regions)
 
@@ -118,7 +118,7 @@ g\. Explain in what sense the Swiss roll is a two-dimensional object embedded in
 \
 The Swiss roll is an object that can be unrolled into a two-dimensional structure whereby the true distances between points are measured along. Thus points that may appear close by in the 3D embedding are actually far apart when the distance is traced along the roll ( in 2D) as opposed to across ( which is what ordinary Euclidean distances would measure).
 
-## **Self-organising maps** 
+## **Self-organising maps**
 
 1\. Describe why SOMs are more robust to outliers than, say, PCA.
 
@@ -138,7 +138,7 @@ Yes. SOM can behave the same way by looking at the corrosponding features averag
 \
 **Correction: No, not necessarily. Unlike PCA, the SOM axes do not represent fixed linear combinations of the original variables. The grid coordinates are just locations on the lattice. However, component planes can reveal systematic changes in individual variables across the map, which may make certain directions on the grid appear associated with particular feature patterns.**
 
-4\. Suppose that a SOM node has no observations allocated to it. Does it have a prototype vector? If so, how is it determined? \
+4\. Suppose that a SOM node has no observations allocated to it. Does it have a prototype vector? If so, how is it determined?\
 Yes it has a prototype vector, however, the prototype vector in this case is determined by the prototype vectors in the adjacent units
 
 5\. Why might a SOM node have no observations allocated to it?
@@ -155,11 +155,11 @@ This may be due to a large number of grid units (relative to the number of obser
 
 -   learning rate: determines how quickly the algorithm updates the /learns after the addition of a new observation/iteration
 
--    neighbourhood weight function: This determines the degree of effect/movement to neighbouring grids when, j, when a new observation is added to a BMU. Closer units to the BMU will have a greater degree of movement than more distant grid units (which may move very little or not at all)
+-   neighbourhood weight function: This determines the degree of effect/movement to neighbouring grids when, j, when a new observation is added to a BMU. Closer units to the BMU will have a greater degree of movement than more distant grid units (which may move very little or not at all)
 
 -   In early training, these values are large but tend to decrease at later iterations as the grid moves from global organisation to local refinement.
 
-8. Contrast how SOMs and ISOMAP handle non-linearities.
+8.  Contrast how SOMs and ISOMAP handle non-linearities.
 
 -   ISOMAP handles non-linearities by approximating the underlying geodesic distances using a graph network through the observations and applying classical MDS on these distances
 
@@ -181,7 +181,7 @@ This may be due to a large number of grid units (relative to the number of obser
 
 The unit in the grid that best fits a new observation, for which it has the shortest distance amongst grid unit prototype vectors.
 
-12\. Explain how a SOM node can be updated despite having had no observation allocated to it. \
+12\. Explain how a SOM node can be updated despite having had no observation allocated to it.\
 
 When assigning a new observation to a unit in the grid, not only does the BMU move toward the observation but the adjacent units as well, albeit by a lesser degree. The prototype vectors of the surrounding units are also updated when a new observation is added via the difference between its prototype vector and the new observation, the neighbourhood function and the learning rate.
 
@@ -225,28 +225,51 @@ When assigning a new observation to a unit in the grid, not only does the BMU mo
 
 ## **Autoencoders**
 
- 1. Explain the role of the encoder.
+1.  Explain the role of the encoder.
+
+    The encoder maps the high dimensional data into a lower dimensional representation.
 
 2\. Explain the role of the decoder.
 
+-   The decoder maps the encoded data in the lower dimensional representation back to the input higher dimension
+
 3\. Explain under what circumstances an autoencoder behaves like PCA.
+
+-   When the activation function is linear
 
 4\. What is the bottleneck layer?
 
+The bottleneck neck layer is a hidden layer where the data had been transformed into a lower dimensional representation
+
 5\. Explain why non-linear activation functions are important in autoencoders.
+
+Required to capture the underlying non-linear structure of the data.
 
 6\. Suppose the bottleneck layer has as many nodes as the input layer. What is the issue here?
 
+Trivial copying is most likely to occur, where the nueral net just copies and outputs the input data without learning a meaningful lower dimensional representation/encoding of the data
+
 7\. Explain when different relevant loss functions are appropriate.
+
+RMSE: Continuous numerical data
+
+Cross Entropy- categorical type data
 
 8\. What is the autoencoder trying to predict?
 
-9. Explain why held-out data are required for autoencoders.
+The original input
+
+9.  Explain why held-out data are required for autoencoders.
+    -   To asses model performance during training and ensure that the model is not overfitting on unseen data.
 
 10\. Why might reconstruction error eventually begin to increase as the number of nodes in the bottleneck layer increases on:
 
-• the training data;
+• the training data; The NN has not trained for enough time for training error to decrease
 
-• the test data?
+• the test data? Overfitting
 
 11\. In a denoising autoencoder, what is the input and what is the output it is trying to predict? Why is this done?
+
+Input The originial data with some added noise.
+
+The original data observations
