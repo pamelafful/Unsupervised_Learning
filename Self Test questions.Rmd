@@ -1,0 +1,356 @@
+---
+title: "Quiz 2"
+author: "Pamela Afful"
+date: "2026-08-11"
+output: html_document
+---
+
+## 1. Principal Component Analysis (PCA)
+
+**Q1. Conceptual**\
+What is PCA actually trying to optimize when selecting the first principal component? Explain what the first and second principal components represent geometrically.
+
+Answer: PCA tries to maximize the variance of the features along a specific direction or axes. This is achieved by setting the axes equal to the eigenvector associated with the largest eigenvalue of the covariance matrix. The subsequent components also maximise the variance of the data features along another direction/axes with the additional constraint that the subsequent axes are orthogonal to the preceeding k-1 components.
+
+**Q2. Interpretation**\
+You perform PCA on a dataset containing 20 standardized variables. The first three PCs explain 48%, 21%, and 9% of the variance respectively.
+
+a) What proportion of the total variance is captured by the first three PCs
+
+-   total variance explained= 48+21+9=78%
+
+\
+b) Would you necessarily conclude that the remaining 22 variables are unimportant? Explain.
+
+Which 22 variables? The question said that PCA was performed on 20 standardized vars?
+
+\
+c) What additional information would you examine when deciding how many PCs to retain?
+
+-   A scree plot would be beneficial to see at which component we observe the largest drop (elbow) in variance explained. Then select all the preceding component numbers.
+
+**Q3. Scaling**\
+Why is standardization particularly important before applying PCA when the variables are measured on very different scales? Give an example of what could go wrong if you don't standardize.
+
+-   In cases where a single or a group of variables are measured on scales that are large relative to other features, this would dominate the observed variance in the data and as such larger weigts or loadings would be ascribed to these variables when applying PCA.
+
+-   In such cases, standardization would help scale the data/features to comparable magnitudes to give much more accurate PCs.
+
+**Q4. Eigenvalues/eigenvectors**
+
+Suppose the covariance matrix of a dataset has eigenvalues:
+
+λ=(5.2,2.1,1.0,0.7)
+
+a) What percentage of the variance does PC1 explain?
+
+```{r}
+lambdas=sort(c(5.2,2.1,1.0,0.7), decreasing=T)
+lambdas
+
+PC1_var=(lambdas[1]/sum(lambdas))*100
+PC1_var
+```
+
+PC1 explains 57.78% of the variance in the data.
+
+\
+b) How many PCs would you retain if you wanted to explain at least 90% of the variance?
+
+```{r}
+
+cumsum(lambdas)/sum(lambdas)
+```
+
+The first 3 principal components would have to be retained.
+
+\
+c) What is the relationship between the eigenvectors and the principal components?
+
+The eigenvectors determine the weight of each feature in the calculation of the PC score when the data is projected in a specific direction/axes. They also form the axes of direction of the PC.
+
+**Q5. Limitation**\
+A dataset lies approximately on a curved, nonlinear manifold. PCA produces a poor 2D representation.
+
+PCA struggles as it is a linear transformation of the data. Thus, if the underlying data structure is not linear, PCA struggles to capture the associated variation as it cannot bend; it is simple rotations along a specified axes. An alternative would be using a non-linear autoencoder, which can capture/map the non-linear representation of the data in a lower dimension(s).
+
+**Q6. Comparison**\
+
+Explain the difference between **PCA and kernel PCA** in terms of the type of structure each method can capture.
+
+-   Not covered in course.
+
+# 2. Multidimensional Scaling (MDS)
+
+**Q1. Conceptual**\
+What is the primary objective of MDS? In your answer, distinguish between **similarity/dissimilarity information** and the coordinates produced by MDS.
+
+-   MDS aims to produce lower-dimensional coordinates for high-dimensional data observations.
+
+-   It does so from the dissimilarity matrix constructed from the interpoint distances of the observations to each other. This matrix is both symmetric and hollow
+
+-   Dissimilarity speaks to how different/distant the points are from each other in the higher-dimensional space.
+
+**Q2. Interpretation**\
+You have a dataset containing distances between 100 cities based on their geographical locations. You apply classical MDS and obtain a 2D representation.
+
+What does it mean if two cities are close together in the resulting MDS plot? What does it mean if they are far apart?
+
+-   Closer- the two points are close or have low dissimilarity in the higher-dimensional space.
+
+-   Far apart- the two points are further apart or have high dissimilarity in the higher-dimensional space.
+
+**Q3. Classical MDS**\
+Classical MDS begins with a matrix of pairwise distances.
+
+Explain, at a high level, how classical MDS transforms the distance information into coordinates in a lower-dimensional space. Your answer should mention the role of the **distance matrix and eigen-decomposition**.
+
+-   Classical MDS transforms pairwise distances (assumedly measured in Euclidean) into co-ordinates by:
+
+    -   Taking the double-centred inner products of the observations produced from the Gram matrix. This ensures that the eigenvalues/eigenvectors computed from this have associated directions/axes relative to the center.
+
+    -   Then perform eigen decomposition on the above matrix, giving an ordered set of eigenvalues and eigenvectors as co-ordinates in the lower dimension (similar to PCA)
+
+**Q4. Stress**\
+You apply non-metric MDS using 2, 3 and 4 dimensions and obtain:
+
+| Dimensions | Stress |
+|------------|--------|
+| 2          | 0.21   |
+| 3          | 0.11   |
+| 4          | 0.08   |
+
+a) What does stress measure?
+
+-   Stress measures the average deviation of the lower-dimensional distances dij to the function-transformed actual distances Delta ij, with lower values meaning that the configuration better represents the actual distances in the original data.
+
+\
+b) What does the decrease in stress as dimensionality increases tell you?
+
+-   lower values mean that the configuration better represents the actual distances in the original data.
+
+c) Why might you nevertheless choose the 3D solution rather than the 4D solution?
+
+-   For the sake of visualisation. It's impossible to visualize 4 dimensions.
+
+**Q5. Comparison**\
+Explain **one major difference between PCA and MDS** regarding the information they preserve when reducing dimensionality.
+
+-   PCA- uses and preserves the covariance /variation of the features in the dataset
+
+-   MDS - uses and preserves interpoint distances of observations in the data
+
+**Q6. Scenario**\
+You have survey data where respondents have rated the similarity between different brands. You don't have meaningful numerical measurements for the brands themselves, but you do have pairwise similarity judgments.
+
+Would PCA or MDS be more appropriate? **Justify your answer.**
+
+-   MDS would be more appropriate as it lends itself better to non-numerical definitions of interpoint dissimilarities that can be used. PCA requires numerical features to be able to compute their associated covariance matrix.
+
+# 3. ISOMAP
+
+**Q1. Motivation**\
+What problem is ISOMAP designed to solve that ordinary PCA cannot solve effectively?
+
+Explain your answer using the concept of a **nonlinear manifold**.
+
+PCA requires that the data have a linear substructure to properly capture and preserve the variance. In the case where the data lies in a lower dimensional nonlinear curve or manifold, ISOMAP aims to capture or estimate the geodesic distance between points along this nonlinear manifold using a graph network through the observations.
+
+**Q2. Algorithm**\
+Describe the main steps of the ISOMAP algorithm, starting from the original observations and ending with the low-dimensional representation.
+
+Your answer should include:
+
+-    nearest-neighbour graph
+
+-    For each observation, we define a neighbourhood of nearest points either using an appropriate threshold, k nearest neighbours, or a neighbourhood distance radius epsilon
+
+-    graph distances
+
+-    These neighbourhood points are connected by Euclidean straight-line edges. These edges have weights associated with traversing them.
+
+-    shortest paths
+
+-   The shortest path between distant points is associated with traversing the path with the least sum of weights between them. This approximates the nonlinear geodesic distance between points.- which will be the dissimilarity matrix used.
+
+-    MDS
+
+-    The dissimilarity is thus used as the starting input to apply classical MDS to.
+
+**Q3. Euclidean vs geodesic distance**\
+Consider points lying on a curved "Swiss roll" manifold.
+
+Why can ordinary Euclidean distance between two points be misleading? How does ISOMAP attempt to obtain a more meaningful distance?
+
+The Swiss roll is an object that can be unrolled into a two-dimensional structure whereby the true distances between points are measured along. Thus, points that may appear close by in the 3D embedding but are actually far apart when the distance is traced along the roll ( in 2D) as opposed to across (which is what ordinary Euclidean distances would measure). ISOMAP essentially unrolls this object in the lower dimension to estimate the true shorstest distances between points ALONG the curve.
+
+**Q4. Parameter choice**\
+ISOMAP requires you to specify either the number of nearest neighbours k or a distance threshold ϵ.
+
+What could happen if k is:
+
+a) too small?: a disconnected clustered graph making it impossible to traverse large distances\
+b) too large?- An almost complete graph, where almost every point is connected, with a strong likelihood that the graph will short-circuit and default to straight-line Euclidean distances between distant points
+
+**Q5. Failure case**\
+Suppose your nearest-neighbour graph consists of several disconnected components.
+
+Why is this problematic for ISOMAP?
+
+-   We can't traverse edges between distant points
+
+What does this tell you about your choice of k or ϵ?
+
+-   The neighbourhood parameters are too small
+
+**Q6. Comparison**\
+You have a dataset whose underlying structure is approximately a **curved 2D surface embedded in 100 dimensions**.
+
+Compare PCA and ISOMAP for this problem. Which would you expect to perform better and **why**?
+
+ISOMAP would perform better due to the non-linear substructure of the data. ISOMAP will be able to approximate the geodesic distance between these points in the lower dimension.
+
+# 4. Self-Organizing Maps (SOM)
+
+**Q1. Conceptual**\
+A SOM is described as an **unsupervised neural network**.
+
+What does "unsupervised" mean in this context, and what is the purpose of the SOM's grid of neurons?
+
+-   There is no target variable to necessarily split the data on.
+
+-   The grid organizes clusters into grid units based on the observation's proximity to the grid unit's prototype vector
+
+**Q2. Algorithm**\
+Describe the major steps that occur when a single observation is presented to a SOM.
+
+Your answer should explain:
+
+1.   For each observation xi, we calculate the distance between the observation and all the set of prototype vectors in the original space
+
+2.   Finding the Best Matching Unit (BMU)
+
+3.   The observation is assigned to the grid unit of the prototype vector it has the shortest distance with. This is the BMU of that observation
+
+4.   Updating the BMU
+
+5.   The prototype vector of the BMU is calculated, which is just a vector ofthe mean value of features for data points within the grid unit
+
+6.   Updating neighbouring neurons
+
+7.   The adjacent neurons are also updated : mjnew=mjold+ alpha\*h\*(x-mjold) where alpha and h are the learning rate and neighbourhood weight function, respectively
+
+8.   The role of the learning rate and neighbourhood function
+
+9.   The neighbourhood function controls the degree of movement (or effect) of the adjacent nodes when a new observation is added to the BMU. Closer nodes will have higher weights assigned to them relative to distant nodes
+
+**Q3. Interpretation**\
+After training a SOM, two observations are mapped to neighbouring neurons on the grid.
+
+What does this suggest about the relationship between those two observations?
+
+-   That they should be closer together or more similar in the original space.
+
+Why is the **topological structure** of the SOM useful?
+
+-   This shows how different neighbourhood prototypes are in the original space. A good configuration would show small neighbourhood inter-prototype distances close to each other in the grid whilst big distances are spaced apart.
+
+**Q4. Parameters**
+
+What is the effect of:
+
+a) a very large learning rate at the beginning of training? Large update steps- possible overshooting and unstable grid\
+b) gradually decreasing the learning rate? Slow update steps local grid \
+c) gradually decreasing the neighbourhood radius? - less units are affected by the addition of an observation to the BMU. Possibly static grid with poor organisation.
+
+Why are these quantities typically changed during training?
+
+**Q5. Scenario**\
+You have customer data containing income, age, spending behaviour and purchasing frequency, but no target variable.
+
+You train a SOM and obtain several distinct regions on the map.
+
+How could you use the SOM to identify customer segments? What would you need to be careful about when interpreting those segments?
+
+**Q6. Comparison**\
+Compare SOM with PCA as dimensionality-reduction/visualization techniques.
+
+Give **two similarities and two differences**, particularly with respect to:
+
+-   
+
+-    linear vs nonlinear structure
+
+-   
+
+-    topology
+
+-   
+
+-    interpretability
+
+-   
+
+-    the type of output produced
+
+# 5. Autoencoders
+
+**Q1. Architecture**\
+What are the three main conceptual components of an autoencoder, and what is the purpose of each?
+
+**Q2. Bottleneck**\
+Why is a **bottleneck layer with fewer neurons than the input layer** important for dimensionality reduction?
+
+What would happen if the network simply had enough capacity to reproduce the input without any meaningful bottleneck?
+
+**Q3. Reconstruction**\
+An autoencoder is trained to minimize:
+
+L(X,X\^)=n1​i=1∑n​∥Xi​−X\^i​∥2
+
+What are Xi​ and X\^i​? What is the model actually learning to minimize?
+
+**Q4. PCA connection**\
+Under what conditions can a simple **linear autoencoder** learn a representation closely related to PCA?
+
+Why does introducing nonlinear activation functions allow an autoencoder to capture structures that ordinary PCA cannot?
+
+**Q5. Overfitting**\
+You train an autoencoder with a very large number of hidden neurons and obtain an extremely low reconstruction error on the training data.
+
+Why might this **not** mean that you have obtained a good dimensionality-reduction model?
+
+Give at least two ways you could address the problem.
+
+**Q6. Scenario/comparison**\
+You have 500-dimensional data containing a complicated nonlinear structure and want a 2D visualization.
+
+Compare **PCA, ISOMAP and an autoencoder** for this task.
+
+For each method, state:
+
+-   
+
+-    what structure it attempts to preserve/capture;
+
+-   
+
+-    whether it is linear or nonlinear;
+
+-   
+
+-    one major advantage;
+
+-   
+
+-    one major limitation.
+
+# Harder Qs
+
+**B1.** You apply PCA, MDS and ISOMAP to the same dataset and obtain three very different 2D plots. **Why is this not necessarily evidence that one of the methods is "wrong"?**
+
+**B2.** A dimensionality-reduction method gives you an excellent-looking 2D plot. Does that automatically mean that the method has produced a good representation of the original dataset? Explain.
+
+**B3.** Explain why **preserving variance**, **preserving pairwise distances**, and **preserving neighbourhood structure** are three different objectives. Which of PCA, MDS and ISOMAP is most closely associated with each?
+
+**B4.** Imagine a dataset shaped like a long, curved crescent. Predict qualitatively what you would expect PCA, MDS, ISOMAP, SOM and a nonlinear autoencoder to do with it. **You don't need to draw it — describe the expected behaviour.**

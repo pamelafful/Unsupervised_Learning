@@ -8,11 +8,17 @@ editor: visual
 
 1\. Explain the problem with simply maximising the variance for each principal component.
 
-We could just arbitrarily multiply the loading vector by a scalar to make the variance bigger, which makes the objective function meaningless (as the solution is infinite)
+-   This would just make the loading vectors longer without necessarily changing the direction of the loading axes.
+
+-   We could just arbitrarily multiply the loading vector by a scalar to make the variance bigger, which makes the objective function meaningless (as the solution is infinite)
+
+-   Also, an additional constraint had to be added to the objective function to ensure the PC do not choose the same direction as the first component
 
 2\. Why must a loading vector be restricted to unit length? Is there anything special about choosing unit length rather than some other fixed length?\
-\
-The unit-length constraint is necessary because multiplying every coefficient by a large constant would otherwise increase the variance without changing the direction.
+
+-   Without a fixed length, its coefficients could be multiplied by an arbitrarily large constant, increasing the score variance without changing the direction.
+
+-   Unit length is partly chosen for convenience, but does entail that the variance of the principal component is the same as the corresponding eigenvalue.
 
 3.  Interpret the following biplots.
 
@@ -22,15 +28,17 @@ The unit-length constraint is necessary because multiplying every coefficient by
 
 5.  Suppose that the first principal component captures 99.5% of the variation and loads on only one variable. What might have given rise to this?\
     \
-    We need to standardize the variables. If the first variable is measured on a bigger scale relative to other features which in turn dominates the variances.
+    We need to standardize the variables. If the first variable is measured on a bigger scale relative to other features, which in turn dominates the variances.
 
 6.  Discuss whether standardisation is warranted in each of the following settings:\
 
-    -   height and weight
+    -   height and weight- measured in different units- standardization is needed
 
-    -   gene expression across 10,000 genes, where some genes are expressed and others are not.
+    -   gene expression across 10,000 genes, where some genes are expressed, and others are not.- Unexpressed genes have (nea-)zero variance and cannot be standardised without either throwing an error or artificially inflating the importance of noise. Such genes should be excluded from the analysis, or else all data should be appropriately transformed (e.g. asinh) so that variability is more comparable between expressed and unexpressed genes
 
 7.  Discuss the effect on the interpretation of the loadings if they are all multiplied by −1.
+
+    -   Overall interpretation remains the same (e.g. PC captures overall size, or an aspect of shape). Interpretation of actual scores will flip (e.g. positive now means small or thin, when before it meant large or fat)
 
 8.  How might we handle highly skewed variables?\
     Apply some transformation to the data that brings extreme disparities closer and makes them more reasonable
@@ -40,17 +48,21 @@ The unit-length constraint is necessary because multiplying every coefficient by
     • association between variables- Looking at the angle between feature vectors in the lower dim plot. Feature vectors with angle between 0 and 90 (excluding) show positive correlation betwen features with smaller angles denoting higher correlations, 90 degree angles showing no correlations, angle greater than 90 to 180 angle showing negative correlations\
     • drivers of spread between variables.- we see the direction in which vectors for features increase and which observations lie in that direction (implying that those observations have larger values for those feature(s)). Feature vectors with longer lengths imply that the majority of the variation in the lower PCA dimension is dominated by that feature(s)
 
-10. Calculate the PCA score for the following observation and loading vector.
+10. Calculate the PCA score for the following observation and loading vector.- Take weighted sum
+
+    -   a1x1+a2x2+a3x3...
 
 11. Calculate the variance of a principal component for the supplied loading vector and covariance matrix Σ.
+
+    Var(𝑌 ) = 𝒂𝑇 Σ𝒂 where a= loading vector sigma=covariance
 
 ## **Multidimensional scaling**
 
 a\. Let Δ be an 𝑛×𝑛 dissimilarity matrix. How many parameters does MDS optimise when fitting:
 
-• a two-dimensional map? 2
+• a two-dimensional map? 2n
 
-• a 𝑘-dimensional map? k
+• a 𝑘-dimensional map? kn
 
 b\. What does classical MDS aim to represent?
 
@@ -236,10 +248,12 @@ When assigning a new observation to a unit in the grid, not only does the BMU mo
 3\. Explain under what circumstances an autoencoder behaves like PCA.
 
 -   When the activation function is linear
+-   A linear autoencoder behaves like PCA when the encoder and decoder are linear and the model is trained using squared reconstruction error, with a bottleneck of dimension q.
+-   It learns the same q-dimensional principal subspace as PCA, although the latent coordinates need not have PCA's orientation, ordering, or scaling unless additional constraints are imposed.
 
 4\. What is the bottleneck layer?
 
-The bottleneck neck layer is a hidden layer where the data had been transformed into a lower dimensional representation
+The bottleneck neck layer is a hidden layer where the data had been transformed into a lower dimensional representation. It that forces the network to represent the input using a restricted number of latent dimensions.
 
 5\. Explain why non-linear activation functions are important in autoencoders.
 
@@ -251,9 +265,9 @@ Trivial copying is most likely to occur, where the nueral net just copies and ou
 
 7\. Explain when different relevant loss functions are appropriate.
 
-RMSE: Continuous numerical data
+RMSE or just Mean Squared Error: Continuous numerical data
 
-Cross Entropy- categorical type data
+Binary Cross Entropy- categorical type data or binary data
 
 8\. What is the autoencoder trying to predict?
 
