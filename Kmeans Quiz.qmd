@@ -1,0 +1,18 @@
+---
+title: "Kmeans Quiz"
+author: "Pam"
+format: html
+editor: visual
+---
+
+```{r}
+a_i=2
+b_i=5
+s_i=(b_i-a_i)/max(c(a_i,b_i))
+s_i
+```
+
+```{r}
+0.48-0.04
+0.5-0.03
+```
