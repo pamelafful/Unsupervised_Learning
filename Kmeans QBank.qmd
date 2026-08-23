@@ -23,3 +23,90 @@ editor: visual
 14. B
 15. A
 16. D
+
+# Section B: Short-Answer Questions \[14 marks\]
+
+3.1 Question B1: One k-means iteration \[3 marks\]
+
+```{r}
+K=2
+u1=c(1,1)
+u2=c(7,7)
+
+A=c(1,1)
+B=c(1,2)
+C=c(2,1)
+D=c(7,7)
+E=c(8,7)
+F=c(7,8)
+
+all_points=list(A,B,C,D,E,F)
+
+cluster_assin=c()
+
+for(i in 1:length(all_points)){
+  x1= rbind(all_points[[i]],u1)
+  x2=rbind(all_points[[i]],u2)
+  c1=dist(x1)
+  c2=dist(x2)
+  cluster_i=min(c1,c2)
+  cluster_assin=c(cluster_assin,ifelse(cluster_i==c1,1,2))
+  
+}
+
+cluster_assin
+
+
+cl_1_mean=apply(rbind(A,B,C),2,mean)
+cl_2_mean=apply(rbind(D,E,F),2,mean)
+cl_1_mean;cl_2_mean
+```
+
+**3.2 Question B2: Feature scale \[2 marks\]**
+
+In USArrests, the standard deviations of Murder, Assault, UrbanPop and Rape are approximately 4.36, 83.34, 14.47 and 9.37. The aim is to group states by an overall crime profile in which all four features should contribute comparably. Would you standardise the features before fitting k-means? Give a reason for your decision and state one reason why standardisation should not be automatic in every application.
+
+-   Yes I would. The sd for Assualt is comparably bigger amoungst the features and would most probably artificially dominate the clustering. Thus all features would be standardised
+
+-   Standardization is not automatic as it changes the clustering of the observations. If features are measured in the same and comparable scale, then observation values can be used directly.
+
+3.3 Question B3: Silhouette calculation \[3 marks\]
+
+For one observation, 𝑎(𝑖) = 1.20 and 𝑏(𝑖) = 1.50.
+
+a\. Calculate its silhouette value. \[1 mark\]
+
+```{r}
+a_i=1.2
+b_i=1.5
+
+s_i=(b_i-a_i)/(max(c(a_i,b_i)))
+s_i # close to 0, indicating that the point is balanced and equidistant from its own cluster and its nearest cluster
+```
+
+b\. Interpret the value. \[1 mark\]
+
+-   close to 0, indicating that the point is balanced and equidistant from its own cluster and its nearest cluster
+
+c\. State one sensible follow-up check for this observation. \[1 mark\]
+
+Check the stability of cluster assignment by checking how this observation would be assigned by another algorithm (e.g PAM) or through subsampling.
+
+**3.4 Question B4: Stability evidence \[2 marks\]**
+
+At 𝐾 = 4 solution is identical across 100 seeds when nstart = 25. Agreement with PAM is 84%, and its adjusted Rand index has a low lower tail across 90% subsamples. What does this evidence say about the strengths and weaknesses of the solution? Include one caution about what stability can establish
+
+-   84% agreement suggests there is evidence of meaningful clustering for most of the data, suggesting there is a reasonable cluster structure in the data; the 84% agreement with PAM provides evidence that the K=4 solution is reasonably consistent across two different clustering methods
+
+-   However, the clustering does seem to have some sensitivity to the data itself, as ARI scores with subsampling show lower values, which can affect the stability of some cluster assignments at a chosen K.
+
+-   One could check if the same points/observations are changing clusters for both stability checks. If so, it would also be worth checking the silhouette scores associated with these points
+
+-   Expanded answer:\
+    **The identical solution across 100 seeds indicates that the** K=**4 K-means solution is stable with respect to random initialization, suggesting that the solution is not strongly affected by local initialization. The 84% agreement with PAM provides further evidence that the clustering is reasonably robust to the choice of clustering algorithm. However, the low lower tail of the ARI distribution under 90% subsampling suggests that the solution has some sensitivity to perturbations in the data, with some resamples producing substantially different cluster assignments. It would therefore be useful to identify which observations are unstable and examine their silhouette widths to determine whether they are poorly separated or lie near cluster boundaries. Importantly, stability demonstrates reproducibility under the particular perturbations tested; it does not by itself establish that the clusters represent meaningful or true underlying groups.**
+
+**3.5 Question B5**
+
+**Decide whether either candidate should be used \[4 marks\]**
+
+A provincial health team wants to group clinics by service-demand profile. The features were standardised because the team agreed that patient volume, waiting time, stock-out rate and travel distance should have comparable influence
