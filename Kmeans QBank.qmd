@@ -109,4 +109,58 @@ At 𝐾 = 4 solution is identical across 100 seeds when nstart = 25. Agreement w
 
 **Decide whether either candidate should be used \[4 marks\]**
 
-A provincial health team wants to group clinics by service-demand profile. The features were standardised because the team agreed that patient volume, waiting time, stock-out rate and travel distance should have comparable influence
+A provincial health team wants to group clinics by service-demand profile. The features were standardised because the team agreed that patient volume, waiting time, stock-out rate and travel distance should have comparable influence.
+
+-   **Revise:** Although cluster metrics/diagnostics for K=2 are better compared to K=4 under standardized features, the conclusion/ treatment of the clinics based on the results leaves room for further analysis regarding the underlying structure of the data:
+
+    -   the representation of the clinic- All features were standardized, so all of them had "equal" influence on the overall variation of the data
+
+    -   Individual fit/stability: K=2 shows greater fit with higher silhouette scores and no observations with negative silhouettes, indicating that no observations were probably misclassified-The absence of negative silhouettes suggests that no clinics are clearly closer to another cluster than their assigned cluster, supporting good separation
+
+    -    98% of observations were classified the same as PAM, whilst all observations were consistently classified in the same cluster, showing broad algorithmic agreement and stability. Also, the model is less data-sensitiv;h repeated subsampling at 10% of samples **have an ARI of at least 0.96**. ,compared to 0.55 for K=4 (more fragile model).
+
+    -   **The 10th percentile subsample ARI of 0.96 indicates very strong stability even in the lower tail, whereas K=4's value of 0.55 indicates substantially greater sensitivity to subsampling.**
+
+    -   However, despite the stability of the clustering at K=2, there still is no clear evidence that the clusters are practically useful given the conclusion of equal intervention treatment for the two groups. This might suggest that there may not be an actual cluster substructure in the data.
+
+    -   To further verify/ look for evidence, a gap statistic analysis would be useful to compare the gap at different values of K against a reference null distribution to see if there is evidence the the extra clustering (K\>1) captures more information about the underlying data structure as opposed to mere noise.
+
+    -   Also, further analysis on the distributions of the key features for the different clusters would be useful to ascertain whether certain features hold higher the average values for the different clusters. If they are broadly the same, this may be further evidence that there may not be a clear cluster structure in the data.
+
+    -   Recheck if the features are actually meaningful to the spread of the data/clusters
+
+# Lab Section
+
+```{r}
+lab <- read.csv("kmeans-lab-toy.csv") # load one row per service site
+x_raw <- lab[c("demand_score", "complexity_score")] # keep only clustering features
+# Complete each call using the inspection described by its comment.
+
+
+
+head(lab)
+
+```
+
+```{r}
+dim(lab) # show dimensions, variable names and data types
+summary(x_raw) # show min, quartiles, median, mean and max by feature
+colSums(is.na(x_raw)) # count missing observations in each feature
+```
+
+```{r}
+# Plot the two features and label every site.
+plot(
+x_raw$demand_score, x_raw$complexity_score,
+xlab = "Demand score", ylab = "Complexity score",
+pch = 19
+)
+text(
+x_raw$demand_score, x_raw$complexity_score,
+labels = lab$site_id, pos = 3, cex = 0.65
+)
+```
+
+```{r}
+
+```

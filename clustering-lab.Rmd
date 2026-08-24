@@ -1,0 +1,314 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+; --- title: "Clustering Lab" subtitle: "STA5077 Unsupervised Learning"
+output: html_document: code_folding: hide df_print: paged ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+source(file.path("R", "lab-helpers.R"), local = FALSE)
+check_lab_packages()
+
+dat <- load_lab_data() #read.csv("/Users/shirleyknight/Downloads/STA5077-clustering-lab/data/assignment-data.txt", sep = '', header = FALSE)
+  #load_lab_data()
+sapply(dat, summary)
+sapply(dat, sd)
+```
+
+# 1. Initial Planning
+
+OBJECTIVE - FIND HOW MANY CLUSTERS IN THE DATASET.
+
+**Instruction — 10 minutes.** Agree on the purpose of the analysis, how
+similarity should be defined, plausible algorithms, and the evidence
+needed for a final decision.
+
+Purpose of the analysis - find a defensible number of clusters in the
+data.
+
+Similarity to be defined - since it is continuous numerical data, and we
+do not have any initial information to prompt the use of Manhattan
+distance, we will use the Euclidean distance.
+
+Plausible algorithms - K-Means and Agglomerative Hierarchical Clustering
+(AHC), to evaluated the plausibility of a nested cluster structure.
+
+Evidence needed for final decision - diagnostics (silhouette width,
+elbow plot, gap statistic) and then stability testing (different
+seeds/initialisation for K-means, agreement between AHC and K-means,
+subsampling).
+
+**Plan.** Record your decisions and reasons before analysing the data.
+
+Other decisions to be made - scaling/standardising the data (evaluated
+through EDA), treatment of missing values (if there are any).
+
+**Plan discussion.** Revise the plan only where the discussion gives you
+a reason.
+
+Order of plan important to understand the dependencies. 1) Variable
+Analysis - EDA, summary statistics (outliers, comparable numerical
+scales, missing values)
+
+>  
+
+```{r planning-analysis}
+
+```
+
+**Analysis and decision.** Record the agreed workflow, settings and
+decision criteria.
+
+>  
+
+**Class feedback.** Add one useful point raised by another group.
+
+>  
+
+# 2. EDA and Data Preparation
+
+**Instruction — 15 minutes.** Decide what you need to learn about the
+data before clustering, then perform the checks needed to support your
+preparation decisions.
+
+**Plan.** What will you inspect, and what decision will each check
+inform?
+
+We will check each feature - statistics, distribution
+(scaling/transforming), missing values.
+
+No missing values - important as we can't do Euclidean distance with it.
+Outliers - summary stats & marginal distribution
+
+Summary stats - scaling decision Scatter plot - outliers, overlap, see
+something about cluster geometry (long/short/nested/orientation etc -
+informs clustering method). Plot most important here because only 2
+variables. Histograms - most useful for \>2 variables. Correlation
+important - checking for redundant features.
+
+**Plan discussion.** Record any justified change before coding.
+Comparable ranges, although V2 has a much lower minimum. Very similar
+standard deviation.
+
+```{r eda-analysis}
+# distributions
+plot_marginal_distributions(dat)
+plot_feature_scatter(dat)
+
+# missing values 
+any(is.na(dat))
+
+# very low correlation
+cor(dat)
+
+dat |>
+  ggplot(aes(x = V1))+ geom_boxplot() 
+
+```
+
+**Finding and decision.** State what you learned and any preparation you
+will apply. Give a reason.
+
+No scaling - comparable scales. Appears to be suitable for K-means and
+AHC clustering. Will carry both algorithms through the analysis. No
+redundant features for analysis.
+
+**Class feedback.** Record whether the discussion changed your decision.
+
+>  
+
+# 3. Choosing K
+
+**Instruction — 20 minutes.** Compute diagnostic evidence over a
+defensible range of K and use it to choose a small shortlist for
+sensitivity analysis.
+
+**Plan.** Specify the K range, algorithms, fitting settings and decision
+criteria before examining the results.
+
+>  
+
+**Plan discussion.** Record any justified change before implementation.
+
+>  
+
+```{r choose-k-analysis}
+
+# calculate the objective function for each value of k 
+wcss <- sapply(2:20, 
+       function(k){
+         kmeans(x = dat,
+                centers = k,
+                nstart = 25)$tot.withinss
+       }
+       )
+# helper function needs k, the algorithm, and the objective function value for each k 
+k_results <- data.frame(k = 2:20, algorithm = "K-means", objective = wcss)
+plot_elbow_curve(k_results)
+```
+
+The supplied plotting functions expect your results table to contain
+`k`, `algorithm`, `objective` and `avg_silhouette` columns.
+
+```{r choose-k-plotting-helpers, eval=FALSE}
+plot_elbow_curve(k_results)
+
+
+d <- dist(dat)
+
+avg_sil <- sapply(
+  2:20,
+  function(k){
+    set.seed(5077)
+    fit_k <- kmeans(x = dat, 
+                centers = k, 
+                nstart = 25, 
+                algorithm = "Lloyd")
+    mean(silhouette(fit_k$cluster, dist = d)[,3])
+  }
+)
+  
+k_results2 <- data.frame(k = 2:20, algorithm = "K-means", objective = wcss, avg_silhouette = avg_sil )
+plot_silhouette_curve(k_results2)
+
+gap <- clusGap(
+  dat,
+  FUNcluster = kmeans,
+  nstart = 25, 
+  K.max = 20,
+  B = 50
+)
+
+plot(gap, main = "Gap Statistic")
+maxSE(gap$Tab[,"gap"],
+      gap$Tab[,"SE.sim"])
+```
+
+**Finding and decision.** Give your shortlist and explain the evidence
+for retaining each candidate.
+
+Avg silhouette width maximum at K = 15 clusters.
+
+Gap stat 1SE rule found optimal at K = 3 clusters (local optimum). From
+plot, K = 3 and K = 6 look good - simplified clusters may be more
+stable. Global optimum is at K = 15. From K = 15 onwards - small
+difference in avg silhouette width.
+
+**Class feedback.** Record one alternative shortlist or interpretation.
+
+>  
+
+# 4. Sensitivity Analysis
+
+**Instruction — 22 minutes.** Test whether the shortlisted solutions,
+and the preferred K, are stable to initialisation and changes in the
+observations analysed.
+
+**Plan.** Choose feasible repetitions and state what would count as
+concerning instability.
+
+>  
+
+**Plan discussion.** Record any justified change before implementation.
+
+>  
+
+```{r sensitivity-analysis}
+# tried below, ignore if not useful
+fits_3 <- lapply(
+  1:100,
+  function(s){
+    set.seed(s)
+    kmeans(dat,
+           centers = 3,
+           nstart = s)$cluster
+  }
+)
+fits_6 <- lapply(
+  1:100,
+  function(s){
+    set.seed(s)
+    kmeans(dat,
+           centers = 6,
+           nstart = s)$cluster
+  }
+)
+fits_15 <- lapply(
+  1:100,
+  function(s){
+    set.seed(s)
+    kmeans(dat,
+           centers = 15,
+           nstart = s)$cluster
+  }
+)
+
+plot_initialisation_objectives()
+```
+
+Available plotting helpers, depending on the analyses your group
+performs:
+
+```{r sensitivity-plotting-helpers, eval=FALSE}
+plot_initialisation_objectives(initialisation_results)
+plot_subsample_mismatches(subsample_results)
+plot_kstar_frequency(kstar_results)
+```
+
+**Finding and decision.** Which candidates remain credible? Distinguish
+initialisation sensitivity from sensitivity to the data.
+
+>  
+
+**Class feedback.** Record one limitation of the sensitivity evidence.
+
+>  
+
+# 5. Cluster Analysis and Final Selection
+
+**Instruction — 23 minutes.** Compare the retained partitions and
+recommend one solution, revise the analysis, or conclude that no
+solution is sufficiently defensible.
+
+**Plan.** State how you will compare the candidates before viewing all
+final plots.
+
+>  
+
+**Plan discussion.** Record any justified change before implementation.
+
+>  
+
+```{r final-analysis}
+
+```
+
+The plotting helpers take assignments and model results that you create
+in the analysis block.
+
+```{r final-plotting-helpers, eval=FALSE}
+plot_candidate_clusters(
+  data = dat,
+  assignments = candidate_assignments,
+  representatives = candidate_representatives,
+  candidate_label = candidate_label
+)
+
+plot_candidate_silhouette(
+  silhouette_result = candidate_silhouette,
+  candidate_label = candidate_label
+)
+```
+
+**Finding and final decision.** State your recommendation, supporting
+evidence and most important reservation.
+
+>  
+
+**Class feedback.** Record how your conclusion compares with the class
+decision.
+
+>  
