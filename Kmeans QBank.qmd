@@ -163,4 +163,107 @@ labels = lab$site_id, pos = 3, cex = 0.65
 
 ```{r}
 
+feature_sd <- sapply(x_raw,sd) # calculate the standard deviation of each feature
+feature_range <- sapply(x_raw, function(x){ max(x)-min(x) }) # calculate max minus min
+feature_sd # compare typical feature spreads
+feature_range # compare full observed feature ranges
+use_scaled <-FALSE # enter TRUE to standardise or FALSE to retain original indices
+x <- if (use_scaled) scale(x_raw) else x_raw # create the chosen representation
+
+# Featur
+```
+
+Feature scales and SDs are quite close and comparable to each other in their original scales. Standardizing the data widens this gap- thus the data in its original scale will be used
+
+```{r}
+library(cluster) # provide silhouette() and PAM for later questions
+ks_wcss <- 1:5
+wcss <- sapply(ks_wcss, function(k) {
+set.seed(5077) # make the fit for this K reproducible
+fit_k <-kmeans(x, k) # fit k-means to x with centres = k and nstart = 25
+fit_k$tot.withinss # return total WCSS from fit_k
+})
+d <-dist(x) # calculate Euclidean dissimilarities once for all silhouette checks
+ks_sil <- 2:5
+avg_sil <- sapply(ks_sil, function(k) {
+set.seed(5077) # make the fit for this K reproducible
+fit_k <- kmeans(x, k) # fit k-means to x with centres = k and nstart = 25
+mean(silhouette(fit_k$cluster, d)[, 3]) # return the mean silhouette width using fit_k and d
+})
+par(mfrow = c(1, 2)) # place the two diagnostic plots side by side
+# plot total WCSS against K using points joined by lines
+# plot average silhouette against K using points joined by lines
+
+plot(2:5, avg_sil, type = "b",xlab = "K", ylab = "Average silhouette")
+par(mfrow = c(1, 1)) # restore the one-plot layout
+data.frame(K = ks_sil, average_silhouette = round(avg_sil, 3))
+```
+
+Highest avg silhouette score is achieved at K=3 or K=4
+
+```{r}
+chosen_k <- 3 # enter the preferred K from Lab Question 3
+set.seed(5077) # make the final fit reproducible
+km <-kmeans(x, chosen_k) # fit k-means to x using chosen_k and nstart = 25
+
+table(km$cluster) # print the number of sites assigned to each cluster
+km$centers[1,1]# print the fitted cluster centres
+km$tot.withinss # print the total within-cluster sum of squares
+# Plot assignments in the chosen representation.
+plot(
+x, col = km$cluster, pch = 19,
+xlab = "Demand representation",
+ylab = "Complexity representation"
+)
+
+points(km$centers[1,1], km$centers[1,2], col = "red", pch = 8, cex = 2,lwd=2) # add the fitted centres using pch = 8, cex = 2 and lwd = 2
+
+points(km$centers[2,1], km$centers[2,2], col = "red", pch = 8, cex = 2,lwd=2) # add the fitted centres using pch = 8, cex = 2 and lwd = 2
+
+points(km$centers[3,1], km$centers[3,2], col = "red", pch = 8, cex = 2,lwd=2) # add the fitted centres using pch = 8, cex = 2 and lwd = 2
+
+```
+
+```{r}
+library(dplyr)
+sil <- silhouette(km$cluster, d)[, 3] # calculate silhouettes from km$cluster and Euclidean dissimilarities
+
+site_ids=lab|> pull('site_id')
+
+
+ # plot the silhouette values
+
+barplot(sil, 
+        names.arg = site_ids, 
+        horiz = TRUE,# Add labels below bars
+        col = "skyblue",            # Set fill color
+        border = "black",           # Set border color
+        main = "Silhouette Scores for K=3",    # Add main title
+        xlab = "Store ID",        # Add X axis label
+        ylab = "s(i)")            # Add Y axis label
+
+
+# Continue Tomorrow
+
+weak <- ___ # obtain row indices of the three smallest silhouette widths
+cbind(
+lab[weak, ], # show the site identifiers and original feature values
+assigned_cluster = sil[weak, "cluster"], # show fitted cluster membership
+silhouette = round(sil[weak, "sil_width"], 3) # show rounded widths
+)
+seeds <- 1:20 # use the same seed values in both comparisons
+one_start_wcss <- sapply(seeds, function(s) {
+set.seed(s) # control the initialisation for this run
+___ # fit chosen_k with one start and return total WCSS
+})
+many_start_wcss <- sapply(seeds, function(s) {
+set.seed(s) # control the initialisations for this run
+___ # fit chosen_k with 25 starts and return total WCSS
+})
+# Compare the objective values produced by one and many starts.
+boxplot(
+list(`one start` = one_start_wcss, `25 starts` = many_start_wcss),
+ylab = "Total WCSS"
+)
+
 ```
