@@ -1,0 +1,724 @@
+---
+title: "K-Means Clustering Practice Test"
+format: html
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# K-Means Practice Test
+
+> **Instructions:** Try the questions without notes first. Focus on
+> interpreting the evidence rather than simply identifying the largest
+> metric. Answers are intentionally omitted so this can be used as a
+> practice test.
+
+## Part A — Multiple Choice Questions
+
+### Question 1 — Objective function
+
+Which of the following best describes the objective minimized by
+standard K-means clustering?
+
+**A.** The total distance between every pair of observations in the
+dataset.
+
+**B.** The within-cluster sum of squared Euclidean distances between
+observations and their assigned cluster centroids.
+
+**C.** The between-cluster sum of squared distances between observations
+and their cluster centroids.
+
+**D.** The number of observations assigned to each cluster
+
+Ans: B
+
+------------------------------------------------------------------------
+
+### Question 2 — Effect of increasing (K)
+
+Suppose the within-cluster sum of squares (WCSS) is:
+
+| \(K\) | WCSS |
+|------:|-----:|
+|     1 | 1000 |
+|     2 |  600 |
+|     3 |  400 |
+|     4 |  300 |
+|     5 |  250 |
+|     6 |  220 |
+
+Which statement is **most correct**?
+
+**A.** (K=6) must be optimal because it has the smallest WCSS.
+
+**B.** (K=1) must be optimal because it avoids overfitting.
+
+**C.** WCSS alone cannot determine the optimal (K), because WCSS will
+generally decrease as (K) increases.
+
+**D.** (K=3) must be optimal because WCSS decreases most rapidly before
+(K=3).
+
+Ans: C
+
+------------------------------------------------------------------------
+
+### Question 3 — Standardisation
+
+A dataset contains the following variables:
+
+-   Annual patient volume: 5,000–100,000
+-   Average waiting time: 5–120 minutes
+-   Stock-out rate: 0–0.25
+-   Travel distance: 0–50 km
+
+The analyst standardises all four variables before K-means.
+
+What is the **main reason** for doing this?
+
+**A.** To make the variables normally distributed.
+
+**B.** To ensure that variables measured on larger numerical scales do
+not dominate distance calculations.
+
+**C.** To remove correlations between variables.
+
+**D.** To guarantee that K-means finds the global optimum.
+
+Ans: B
+
+------------------------------------------------------------------------
+
+### Question 4 — Random starts
+
+A K-means model with (K=4) is fitted 100 times using different random
+initialisations.
+
+The final clustering is identical in all 100 runs.
+
+What does this provide evidence for?
+
+**A.** The four clusters represent true population groups.
+
+**B.** The clustering is stable with respect to random initialisation.
+
+**C.** The four clusters are statistically significant.
+
+**D.** The data contain no noise.
+
+Ans: B
+
+------------------------------------------------------------------------
+
+### Question 5 — What does random-start stability NOT establish?
+
+A K-means solution is identical across 100 random starts.
+
+Which conclusion is **NOT justified**?
+
+**A.** The solution is robust to the choice of initial centroids.
+
+**B.** The optimisation procedure is consistently finding the same
+solution.
+
+**C.** The clusters necessarily represent meaningful underlying groups.
+
+**D.** There is little evidence that random initialisation is causing
+instability.
+
+Ans: C
+
+------------------------------------------------------------------------
+
+### Question 6 — Silhouette
+
+An observation has a silhouette value of (-0.32).
+
+Which interpretation is most appropriate?
+
+**A.** The observation is very well separated from all other clusters.
+
+**B.** The observation is likely closer to another cluster than to its
+assigned cluster.
+
+**C.** The observation is definitely an outlier.
+
+**D.** The observation must be removed before clustering.
+
+**B**
+
+------------------------------------------------------------------------
+
+### Question 7 — Comparing two (K)'s
+
+Two candidate solutions have the following results:
+
+|                        | (K=3) | (K=5) |
+|------------------------|------:|------:|
+| Average silhouette     |  0.48 |  0.36 |
+| Negative silhouettes   |     1 |    12 |
+| Random-start agreement |  100% |  100% |
+| PAM agreement          |   94% |   71% |
+
+Which statement is **best supported**?
+
+**A.** (K=5) should be chosen because more clusters always provide more
+information.
+
+**B.** (K=3) appears stronger in terms of separation and agreement
+across methods.
+
+**C.** (K=5) must be rejected because it has 12 negative silhouettes.
+
+**D.** Both solutions are equally strong because random-start agreement
+is 100% for both.
+
+**B**
+
+### Question 8 — ARI
+
+You perform 100 subsampling experiments and obtain a 10th percentile ARI
+of 0.91.
+
+What does this mean?
+
+**A.** Exactly 10 observations had an ARI of 0.91.
+
+**B.** Approximately 10% of the subsamples had ARI values of 0.91 or
+higher.
+
+**C.** Approximately 90% of the subsamples had ARI values of
+approximately 0.91 or higher.
+
+**D.** The model has a 91% probability of being correct.
+
+**C**
+
+------------------------------------------------------------------------
+
+### Question 9 — Comparing ARI distributions
+
+Two candidate K-means solutions have:
+
+|                     | (K=2) | (K=4) |
+|---------------------|------:|------:|
+| Mean ARI            |  0.86 |  0.86 |
+| 10th percentile ARI |  0.81 |  0.48 |
+
+What is the strongest conclusion?
+
+**A.** Both solutions have identical stability.
+
+**B.** (K=4) has greater average stability.
+
+**C.** (K=4) has a substantially weaker lower-tail stability despite
+having the same mean ARI.
+
+**D.** (K=2) must have fewer clusters because its ARI is higher.
+
+C
+
+------------------------------------------------------------------------
+
+### Question 10 — Gap Statistic
+
+Suppose:
+
+\[ G(3)=0.72,\qquad G(4)=0.75,\qquad s(4)=0.08 \]
+
+Using the one-standard-error rule:
+
+\[ G(K)\geq G(K+1)-s(K+1) \]
+
+what is the preferred (K)?
+
+**A.** (K=2)
+
+**B.** (K=3)
+
+**C.** (K=4)
+
+**D.** Cannot be determined from the information given.
+
+B
+
+------------------------------------------------------------------------
+
+```{r}
+g3=0.72
+g4=0.75
+s4=0.08
+g3>0.75-0.08
+```
+
+# Part B — Short Answer
+
+### Question 11 — Standardisation \[3 marks\]
+
+A dataset contains income measured in rands, age measured in years, and
+distance measured in kilometres. An analyst applies K-means without
+standardising the variables.
+
+Explain **why this could be problematic** and what standardisation would
+accomplish.
+
+-   Depending on the scales and magnitudes of the different features, a
+    feature with larger scale measurements could artificially dominate
+    the distance metrics and affect overall clustering.
+
+-   To control for this, standardising the features ensures that they
+    are measured at comparable units and makes each feature have a
+    "fair" influence on the clustering of the observations.
+
+------------------------------------------------------------------------
+
+### Question 12 — Random initialisation \[3 marks\]
+
+A (K=5) K-means solution produces five different clusterings across 20
+random initialisations.
+
+**a)** What does this tell you about the solution?
+
+-   The clustering is not stable a various initializations. Different
+    initializations produce different results
+
+**b)** What could the analyst do to investigate or reduce this issue?
+
+-   Assess cluster/ model stability across various values of K and
+    follow through with the value of K that produces the most stable and
+    consistent clusters
+
+------------------------------------------------------------------------
+
+### Question 13 — Silhouette interpretation \[4 marks\]
+
+A (K=4) solution has:
+
+-   Average silhouette = 0.42
+-   8% of observations have negative silhouettes
+-   Cluster 1 has an average silhouette of 0.65
+-   Cluster 4 has an average silhouette of 0.08
+
+What can you conclude about the quality of the clustering?
+
+-   The observations may be weakly clustered due to the presence of
+    edge/borderline observations.
+
+-   The avg silhouette of the second cluster (closer to 0, suggesting
+    equidistant separation) especially suggests the observations may not
+    be fully represented by the centroids of their clusters/neigbouring
+    clusters
+
+What additional investigation would you perform?
+
+-   Assess overall/cluster averages across various values of K to see if
+    observations are better represented by increase/decrease of cluster
+
+------------------------------------------------------------------------
+
+### Question 14 — Subsampling stability \[4 marks\]
+
+A researcher repeatedly fits a (K=3) K-means model to 90% subsamples of
+their data.
+
+They obtain:
+
+-   Mean ARI = 0.87
+-   Median ARI = 0.91
+-   10th percentile ARI = 0.52
+
+Interpret these results.
+
+**Do not simply say "the ARI is high."** Explain what the spread tells
+you.
+
+-   Median/ Median MRI is at 0.91, suggesting high clustering agreement
+    across subsamples with the baseline clustering- most subsample
+    observations are being consistently assigned to the same clusters as
+    the baseline model
+
+-   However, the lower tail of the clustering, the 10th percentile,
+    shows some fragility, with 10% of subsamples having an ARI of 0.52%
+    or lower, indicating some data sensitivity in the model.
+
+------------------------------------------------------------------------
+
+### Question 15 — Stability versus validity \[4 marks\]
+
+An analyst reports:
+
+> "The (K=4) solution is identical across 100 random starts, has a mean
+> silhouette of 0.51 and a 10th percentile subsample ARI of 0.89.
+> Therefore, we have demonstrated that four genuine clusters exist in
+> the population."
+
+Do you agree?
+
+Explain why or why not.
+
+-   No. Although the clustering may be statistically significant, this
+    is still not evidence of the genuine existence of meaningful
+    clusters in the data. The scores could have also been obtained from
+    noisy data with no underlying cluster substructure.
+
+<!-- -->
+
+-   A Gap statistic analysis would have to be conducted to compare the
+    decrease in the cluster WSS to a null/reference distribution to
+    further strengthen the evidence in addition to conducting a feature
+    analysis of the clusters to see if there are any meaningful
+    differences
+
+------------------------------------------------------------------------
+
+# Part C — Exam-Style Evidence Interpretation
+
+## Question 16 — Choosing between candidates \[6 marks\]
+
+A health department wants to group hospitals according to patient-demand
+characteristics.
+
+Two K-means candidates produce:
+
+| Evidence                      | (K=2) | (K=4) |
+|-------------------------------|------:|------:|
+| Average silhouette            |  0.46 |  0.34 |
+| Negative silhouettes          |     0 |     9 |
+| Random-start agreement        |  100% |   96% |
+| Agreement with PAM            |   96% |   78% |
+| 10th percentile subsample ARI |  0.94 |  0.61 |
+
+Profile review reveals:
+
+-   (K=2): two distinct profiles, but both would receive the same
+    resource allocation.
+-   (K=4): four profiles with different proposed resource allocations.
+
+**Question:**
+
+Which candidate, if either, should be used?
+
+Choose one:
+
+-   **Recommend (K=2)**
+-   **Recommend (K=4)**
+-   **Revise**
+-   **Reject**
+
+Justify your answer using:
+
+1.  cluster representation;
+2.  individual fit;
+3.  stability;
+4.  practical usefulness;
+5.  one limitation or additional check.
+
+Ans (recheck tomorrow)
+
+**Conclusion: Revise**
+
+-   The analysis of K-means clustering results indicates that while the
+    metrics for K=2 are superior to those for K=4 when using
+    standardized features, there are still questions about the practical
+    significance of these clusters. All features were standardized,
+    ensuring equal influence on data variation.
+
+-   K=2 demonstrates better fit with higher silhouette scores and no
+    negative silhouettes, suggesting accurate classification and good
+    separation of clinics. 98% of observations matched PAM
+    classifications, indicating strong algorithmic agreement and
+    stability. Additionally, the model is less sensitive to data
+    variations, as shown by a high 10th percentile ARI of 0.96, compared
+    to K=4’s much lower 0.55, which indicates fragility in results.
+
+-   Despite the clustering stability with K=2, the lack of practical
+    utility in the cluster assignments implies that there might not be
+    meaningful substructure within the data. To further investigate
+    this, conducting a gap statistic analysis could help determine if
+    additional clusters (K\>1) provide real insights or are simply
+    capturing noise. Moreover, exploring the distributions of key
+    features across different clusters could reveal whether certain
+    features significantly differ or align, which would clarify the
+    presence or absence of a distinct cluster structure in the data. It
+    is important to ensure that the features genuinely contribute to the
+    spread within the clusters.
+
+------------------------------------------------------------------------
+
+## Question 17 — The seductive (K=6) solution \[6 marks\]
+
+An analyst reports:
+
+| \(K\) | Avg silhouette | PAM agreement | 10th percentile ARI |
+|------:|---------------:|--------------:|--------------------:|
+|     2 |           0.51 |           96% |                0.94 |
+|     3 |           0.48 |           94% |                0.91 |
+|     4 |           0.43 |           89% |                0.82 |
+|     5 |           0.37 |           78% |                0.68 |
+|     6 |           0.35 |           62% |                0.41 |
+
+However, the analyst argues:
+
+> "The (K=6) solution should be preferred because it gives us six
+> distinct customer segments, whereas (K=2) is too simplistic."
+
+What is wrong with this reasoning?
+
+-   The lower tail suggests that the K=6 model is sensitive to
+    subsampling with 10% of samples reporting an ARI score of 0.41 and
+    below- high disagreement of sample clustering with the baseline
+
+Give a recommendation and explain what evidence you would want before
+adopting (K=6).
+
+-   Gap statistic- to get the optimal K against a refrence distribution
+
+------------------------------------------------------------------------
+
+## Question 18 — The noisy feature problem \[6 marks\]
+
+A company wants to cluster customers using:
+
+-   annual expenditure;
+-   number of purchases;
+-   customer age;
+-   postcode;
+-   random identifier number.- what does this feature meaningfully
+    contribute?
+
+The analyst standardises all five variables and applies K-means.
+
+The resulting clusters have:
+
+-   100% agreement across random starts;
+-   average silhouette = 0.44;
+-   95% PAM agreement.
+
+The analyst concludes:
+
+> "The clustering is highly reliable because all variables were
+> standardised and all diagnostics are strong."
+
+Evaluate this conclusion.
+
+What problem might exist **before** the clustering is even fitted?
+
+------------------------------------------------------------------------
+
+## Question 19 — Gap + stability \[6 marks\]
+
+A researcher obtains the following:
+
+| \(K\) | Gap statistic | 10th percentile ARI |
+|------:|--------------:|--------------------:|
+|     1 |          0.00 |                   — |
+|     2 |          0.31 |                0.95 |
+|     3 |          0.52 |                0.93 |
+|     4 |          0.55 |                0.71 |
+|     5 |          0.56 |                0.43 |
+
+Using the one-standard-error interpretation of the Gap Statistic,
+suppose that (K=3) satisfies the stopping rule.
+
+**a)** What does the Gap Statistic suggest?
+
+-   The observed change/fall in WCSS is larger than the expected
+    change/fall in the WSS (as K increases) under the null hypothesis
+    that the data does not contain underlying clustered structure. Thus
+    at K=3, the number of clusters captures more meaningful information
+    about the structure of the data than what we would expect from
+    random data.
+
+**b)** What does the ARI tell you?
+
+-   ARI speaks to the agreement of similarity of clusters or
+    specifically the observations assigned to the same cluster relative
+    to the baseline. It measures the fraction of pairs of samples that
+    are placed in the same/separate groups via subsampling. At K=3,
+    \~10% of samples reported ARI values less than 0.93 suggesting
+    relatively high stability/ low sensitivity to perturbations to the
+    data
+
+**c)** Why is (K=5) not automatically preferable simply because it has
+the largest gap?
+
+-   We would prefer a more parsimonious model that captures a a
+    meaningful representation of the data whilst ensuring that the model
+    in is more generalizable and less prone to just capturing noise.
+
+**d)** Give an overall recommendation.
+
+K=3- Less Sensitive to data perturbations and clustering is better than
+what we would expect from random data.
+
+------------------------------------------------------------------------
+
+# Part D — Think Like an Examiner
+
+### Question 20
+
+**True or False:**
+
+> "If a K-means solution has 100% agreement across random starts, then
+> the solution is guaranteed to represent meaningful clusters."
+
+Explain your answer in **two sentences**.
+
+Nope:
+
+-   This does not guarantee meaningful actual clusters in the data AND
+
+-   We could get the same info from data generated randomly (e.g from a
+    uniform distribution) that has no underlying clustering.
+
+------------------------------------------------------------------------
+
+### Question 21
+
+**True or False:**
+
+> "A high 10th percentile ARI demonstrates that the clusters are
+> statistically significant."
+
+Explain.
+
+False
+
+-   Data is less sensitive to perturbations in data across subsampling
+    or initializations
+
+-   Although, this could still be obtained from randomly generated data,
+    so the clusterings may NOT be actually significant. Would need to
+    GAP statistic to further provide evidence in support of this.
+
+------------------------------------------------------------------------
+
+### Question 22
+
+**True or False:**
+
+> "A negative silhouette means that the observation has definitely been
+> assigned to the wrong cluster."
+
+Explain what a negative silhouette actually tells you.
+
+-   True(ish) but more strictly it means that the observation is closer
+    to neighboring clusters on average than it in to its own cluster,
+    indicating poor cluster separation
+
+------------------------------------------------------------------------
+
+### Question 23
+
+**True or False:**
+
+> "If (K=5) has a higher average silhouette than (K=3), (K=5) should
+> automatically be selected."
+
+Explain why or why not.
+
+------------------------------------------------------------------------
+
+### Question 24
+
+A colleague says:
+
+> **"Our clustering is stable, therefore it is valid."**
+
+Give a **one-paragraph rebuttal**.
+
+------------------------------------------------------------------------
+
+# Part E — Integrated Exam Question
+
+### Question 25 — Integrated K-means assessment \[8 marks\]
+
+A government department wants to group municipalities according to
+socioeconomic and service-delivery characteristics. The analyst
+standardises all variables because the department wants them to have
+comparable influence.
+
+Two candidate solutions are assessed:
+
+| Evidence                      | (K=3) | (K=5) |
+|-------------------------------|------:|------:|
+| Average silhouette            |  0.44 |  0.36 |
+| Negative silhouettes          |     1 |    11 |
+| Random-start agreement        |  100% |  100% |
+| PAM agreement                 |   93% |   76% |
+| 10th percentile subsample ARI |  0.92 |  0.58 |
+| Gap Statistic                 |  0.61 |  0.63 |
+
+Profile review finds:
+
+**(K=3):** - Three relatively distinct profiles. - All three profiles
+would receive essentially the same intervention.
+
+**(K=5):** - Five more differentiated profiles. - Three profiles would
+receive different interventions. - Two profiles would still receive the
+same intervention.
+
+The analyst recommends (K=5), stating:
+
+> "The Gap Statistic is higher for (K=5), and the five clusters provide
+> more detailed information for policymakers."
+
+### Question
+
+Would you **Recommend (K=3), Recommend (K=5), Revise, or Reject**?
+
+Justify your answer using:
+
+-   representation;
+-   separation/individual fit;
+-   algorithmic stability;
+-   subsampling stability;
+-   practical usefulness;
+-   the Gap Statistic;
+-   and **one limitation of stability analysis**.
+
+------------------------------------------------------------------------
+
+# Quick Conceptual Framework
+
+When assessing a K-means solution, work through these questions:
+
+1.  **Representation**\
+    Are the variables appropriate? Are scale and units handled
+    appropriately? Are irrelevant or redundant variables present?
+
+2.  **Fit / separation**\
+    Are observations reasonably well separated? Consider average
+    silhouette, negative silhouettes, and poorly separated clusters.
+
+3.  **Algorithmic stability**\
+    Does changing random initialisation change the solution?
+
+4.  **Data stability**\
+    Does perturbing the data change the solution? Pay particular
+    attention to the lower tail of the ARI distribution.
+
+5.  **Alternative-method agreement**\
+    Does another method such as PAM recover a similar partition?
+
+6.  **Evidence for genuine structure**\
+    Is there evidence that the observed structure is stronger than
+    expected under an appropriate reference/null distribution? The Gap
+    Statistic can help here.
+
+7.  **Practical usefulness**\
+    Even if the clustering is statistically defensible, does it
+    distinguish groups in a way that matters for the stated purpose?
+
+A useful mental model is:
+
+\[ \boxed{
+\text{Stable}
+\neq
+\text{Meaningful}
+\neq
+\text{Useful}
+} \]
+
+These concepts overlap, but none guarantees the others.
